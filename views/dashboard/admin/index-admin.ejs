@@ -6,34 +6,39 @@
         <h1 class="h3 mb-0 text-gray-800">List Pegawai</h1>
     </div>
 
+        <!-- menampilkan pesan message dari flash -->
+        <% if (msg.length !== 0) { %>
+            <div class="alert alert-success" role="alert"><%= msg %></div>
+            <% } %>
+        
+        <% if (employees.length === 0) { %>
+            <div class="alert alert-warning" role="alert">Data Pegawai tidak tersedia</div>
+        <% } %>
+
     <div class="class">
-        <a href="/admin/tambah" class="btn btn-primary mb-4">+ Tambah Data</a>
+        <a href="/dashboard/admin/tambah" class="btn btn-primary mb-4">+ Tambah Data</a>
     </div>
 
     <!-- Here is body code -->
     <div class="table-responsive">
         <table class="table table-hover">
-            <thead>
+            <thead class="text-center">
                 <th style="min-width: 50px;">ID</th>
                 <th style="min-width: 50px;">Username</th>
                 <th style="min-width: 50px;">Password</th>
-                <th style="min-width: 50px;">Nama</th>
-                <th style="min-width: 50px;">Jabatan</th>
-                <th style="min-width: 80px;" class="text-center">Action</th>
+                <th style="min-width: 50px;">Action</th>
             </thead>
             <tbody>
                 <% employees.forEach((pegawai) => {%>
-                    <tr>
-                        
+                    <tr class="text-center">
+
                         <td><%= pegawai.id_pegawai %></td>
                         <td><%= pegawai.username %></td>
                         <td><%= pegawai.password %></td>
-                        <td><%= pegawai.nama %></td>
-                        <td><%= pegawai.jabatan %></td>
-                        <td>
-                            <a href="#" class="btn btn-info btn-sm">Detail</a>
-                            <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                        <td class="text-center">
+                            <a href="/dashboard/admin/<%= pegawai.id_pegawai %>" class="btn btn-info btn-sm">Detail</a>
+                            <a href="/dashboard/admin/update/<%= pegawai.id_pegawai %>" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="/dashboard/admin/delete/<%= pegawai.id_pegawai  %>" button onclick="return confirm('Apakah yakin untuk menghapus kontak?')" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>
                 <% }) %>

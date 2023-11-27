@@ -2,13 +2,14 @@
 const express = require("express"); // import module express.js
 const app = express(); // membuat aplikasi express
 const expressLayouts = require("express-ejs-layouts"); // import module express-ejs-layouts
+//const paginate = require("express-paginate");
 const host = "localhost";
 const port = 3000; // konfigurasi port
 const { body, check, validationResult } = require("express-validator"); // import module express validator, untuk melakukan unique pada data nama
 const cookieParser = require("cookie-parser"); // import module cookie-parser
 const flash = require("connect-flash"); // import module connect-flash
 const session = require("express-session"); // import module express-session
-const {ambilData} = require("./models/pegawaiModels"); // import module models
+const {ambilData, cekID,cekUsername, cekPassword, tambahData, updateData, hapusData} = require("./models/pegawaiModels"); // import module models
 /* ============================================ END =============================================== */
 
 app.set("view engine", "ejs"); //informasi menggunakan ejs
@@ -29,7 +30,7 @@ app.use(
   })
 );
 
-// ================================================= Start Route Dashboard ====================================
+// Route untuk halaman home-dashboard
 app.get('/dashboard', (req,res)=>{
     res.render('dashboard/home-dashboard', {
         title: "Aplikasi Absensi",
@@ -37,19 +38,202 @@ app.get('/dashboard', (req,res)=>{
     })
 })
 
+// ================================================= Start Route Folder Admin Dashboard ====================================
+
 // Route ke table list pegawai
 app.get('/dashboard/admin/', async (req, res)=>{
-    //const employeesList = await pool.query("SELECT * FROM pegawai");
-    // Mengambil data contact dari hasil kueri ke dalam variabel employees
-    const employees = await ambilData();
-    res.render('dashboard/admin/index-admin', {
-        title: "Page Pegawai",
-        layout: "dashboard/templates/main-layout",
-        employees
+        const employees = await ambilData();
+
+        res.render("dashboard/admin/index-admin", {
+          title: "Page Pegawai",
+          layout: "dashboard/templates/main-layout",
+          employees,
+          msg: req.flash("msg"),
+        })
+})
+
+// Route add dan proses table pegawai
+app.get('/dashboard/admin/tambah', async (req, res) => {
+    res.render('dashboard/admin/tambah-admin', {
+        title: "Page Tambah Pegawai",
+        layout: "dashboard/templates/main-layout"
     })
 })
 
-// Route ke table kehadiran absensi
+app.post(
+    '/dashboard/admin',
+    [
+      body('id_pegawai').custom(async (value) => {
+        const cek_id = await cekID(value);
+  
+        if (cek_id) {
+          throw new Error('ID Pegawai sudah terdaftar');
+        } else {
+          return true;
+        }
+      }),
+      body('username').custom(async (value) => {
+        const cekUser = await cekUsername(value);
+  
+        if (cekUser) {
+          throw new Error('Username sudah terdaftar');
+        } else {
+          return true;
+        }
+      }),
+      body('password').custom(async (value) => {
+        const cekPWD = await cekPassword(value);
+      
+        if (cekPWD) {
+          throw new Error('Password sudah terdaftar');
+        } else {
+          return true;
+        }
+      }),
+      
+    ],
+    async (req, res) => {
+      const errors = validationResult(req);
+  
+      if (!errors.isEmpty()) {
+        res.render('dashboard/admin/tambah-admin', {
+          title: 'Page Tambah Pegawai',
+          layout: 'dashboard/templates/main-layout',
+          errors: errors.array(),
+        });
+      } else {
+        try {
+            console.log('Data yang dikirim:', req.body);
+          await tambahData(req.body.id_pegawai, req.body.username, req.body.password, req.body.nama, req.body.jabatan); // menggunakan fungsi tambahData dari function.js
+          req.flash('msg', 'Data Pegawai Baru Berhasil Ditambahkan!');
+          res.redirect('/dashboard/admin/');
+        } catch (err) {
+          console.error(err.message);
+          req.flash('msg', err.message);
+          res.redirect('/dashboard/admin/');
+        }
+      }
+    }
+  );
+
+// Route untuk detail Pegawai
+app.get('/dashboard/admin/:id_pegawai', async (req, res) =>{
+  try {
+    // Menemukan data berdasarkan id_pegawai untuk ditampilkan dalam halaman detail
+    const employee = await cekID(req.params.id_pegawai);
+    
+    // Menampilkan halaman detail-contact dengan data yang ditemukan
+    res.render('dashboard/admin/detail-admin', {
+      title: 'Page Detail Pegawai',
+      layout: 'dashboard/templates/main-layout',
+      employee,
+    });
+  } catch (err) {
+    console.error(err.message);
+
+    // Menampilkan pesan flash jika terjadi kesalahan
+    req.flash('msg', 'Terjadi kesalahan saat mengambil data untuk detail.');
+
+    // Redirect ke halaman contact
+    res.redirect('/dashboard/admin');
+  }
+})
+
+// Route untuk update dan proses data Pegawai
+app.get('/dashboard/admin/update/:id_pegawai', async (req,  res)=>{
+  try {
+    // Menemukan data berdasarkan id_pegawai untuk diupdate
+    const employee = await cekID(req.params.id_pegawai);
+    if (employee) {
+      res.render('dashboard/admin/update-admin', {
+        title: 'Page Update Pegawai',
+        layout: 'dashboard/templates/main-layout',
+        employee,
+        oldID: req.params.id_pegawai,
+      });
+    } else {
+      // Jika data pegawai tidak ditemukan, redirect ke halaman index pegawai
+      req.flash('msg', 'Data kontak tidak ditemukan.');
+      res.redirect('/dashboard/admin');
+    }
+  } catch (err) {
+    console.error(err.message);
+
+    // Menampilkan pesan flash jika terjadi kesalahan
+    req.flash('msg', 'Terjadi kesalahan saat mengambil data untuk detail.');
+
+    // Redirect ke halaman contact
+    res.redirect('/dashboard/admin');
+  }
+})
+
+// Proses Update
+app.post('/dashboard/admin/update/', async (req, res) => {
+  const { id_pegawai, username, password, nama, jabatan } = req.body;
+
+  try {
+   
+    // Validasi username agar tidak sama dengan data yang sudah terdaftar
+    const isUsernameValid = await cekUsername(username);
+    if (!isUsernameValid) {
+      throw new Error('Username sudah digunakan');
+    }
+
+    // Validasi password agar tidak sama dengan data yang sudah terdaftar
+    const isPasswordValid = await cekPassword(password);
+    if (!isPasswordValid) {
+      throw new Error('Password sudah digunakan');
+    }
+
+    // Jika semua validasi berhasil, lakukan update data
+    const updatedData = await updateData(id_pegawai, username, password, nama, jabatan);
+
+    // Handle berhasil update data
+    req.flash('msg', 'Data Pegawai berhasil diupdate!');
+    res.redirect('/dashboard/admin');
+  } catch (error) {
+    // Handle kesalahan validasi atau update data
+    console.error(error.message);
+    req.flash('msg', error.message);
+    res.redirect('/dashboard/admin');
+  }
+});
+
+// Route untuk delete table pegawai
+app.get('/dashboard/admin/delete/:id_pegawai', async (req, res) => {
+  try {
+    // Memastikan data ditemukan sebelum dihapus
+    const dataPegawai = await cekID(req.params.id_pegawai);
+
+    if (!dataPegawai) {
+      // Jika data tidak ditemukan, tampilkan pesan atau lakukan penanganan khusus
+      req.flash('msg', 'Data Pegawai tidak ditemukan.');
+      res.redirect('/dashboard/admin');
+      return;
+    }
+
+    // Menghapus data
+    await hapusData(req.params.id_pegawai);
+
+    // Menampilkan pesan flash
+    req.flash('msg', 'Data Pegawai Berhasil Dihapus!');
+
+    // Redirect ke halaman dashboard index-admin
+    res.redirect('/dashboard/admin');
+  } catch (err) {
+    console.error(err.message);
+
+    // Menampilkan pesan flash jika terjadi kesalahan
+    req.flash('msg', 'Terjadi kesalahan saat menghapus data.');
+
+    // Redirect ke halaman dashboard admin
+    res.redirect('/dashboard/admin');
+  }
+});
+
+
+
+// ================================================= Start Route Folder Kehadiran Dashboard ====================================
 app.get('/dashboard/kehadiran', async (req,res)=>{
     res.render('dashboard/kehadiran/index-kehadiran', {
         title: "Page Kehadiran",

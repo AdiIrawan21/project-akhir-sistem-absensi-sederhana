@@ -1,0 +1,52 @@
+<!-- views/dashboard/admin/update-admin.ejs -->
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Update Pegawai</h1>
+    </div>
+
+    <% if(typeof errors != "undefined") { %>
+        <div class="alert alert-primary" role="alert">
+          <% errors.forEach(error => { %>
+          <li><%= error.msg %></li>
+          <% }) %>
+        </div>
+        <% } %>
+
+    <div class="mb-3">
+        <a href="/dashboard/admin/" class="btn btn-primary">Kembali</a>
+    </div>
+
+    <!-- Form -->
+    <form method="post" action="/dashboard/admin/update">
+        <div class="mb-3">
+          <label for="id" class="form-label">ID</label>
+          <input type="text" class="form-control" id="id" name="id" value="<%= employee.id_pegawai %>" readonly />
+        </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" value="<%= employee.username %>" required />
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="text" class="form-control" id="password" name="password" value="<%= employee.password %>" required />
+        </div>
+        <div class="mb-3">
+            <label for="nama" class="form-label">Nama</label>
+            <input type="text" class="form-control" id="nama" name="nama" value="<%= employee.nama %>" required />
+        </div>
+        <div class="">
+            <label for="jabatan" class="form-label">Jabatan</label>
+        </div>
+        <div class="mb-3">
+            <select class="form-select" name="jabatan" aria-label="Default select example">
+                <option value="<%= employee.jabatan %>" selected><%= employee.jabatan %></option>
+                <option name="asisten" value="asisten">Asisten</option>
+                <option name="programmer" value="programmer">Programmer</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+    <!-- Akhir form -->
+</div>
