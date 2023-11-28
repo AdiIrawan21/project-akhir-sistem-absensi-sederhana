@@ -9,6 +9,7 @@
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
+                <th style="min-width: 70px;">ID_Kehadiran</th>
                 <th style="min-width: 70px;">Kode</th>
                 <th style="min-width: 70px;">Jabatan</th>
                 <th style="min-width: 100px;">Nama</th>
@@ -17,6 +18,20 @@
                 <th style="min-width: 70px;">Jam Masuk</th>                
                 <th style="min-width: 70px;">Jam Keluar</th>                
             </thead>
+            <tbody>
+                <% kehadiran.forEach((hadir) => {%>
+                    <tr class="text-center">
+
+                        <td><%= hadir.id_kehadiran %></td>
+                        <td><%= hadir.kode %></td>
+                        <td><%= hadir.jabatan %></td>
+                        <td><%= hadir.nama %></td>
+                        <td><%= hadir.tanggal %></td>
+                        <td><%= hadir.keterangan %></td>
+                        <td><%= hadir.jam_masuk %></td>
+                        <td><%= hadir.jam_keluar %></td>
+                        <% }) %>
+            </tbody>
         </table>
     </div>
 

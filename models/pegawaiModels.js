@@ -40,52 +40,71 @@ const cekID = async (id_pegawai) => {
 };
 
 
+// Fungsi untuk cek username unik pada saat tambah dan update data
+const cekUsername = async (username, id_pegawai = null) => {
+  const connection = await pool.connect();
 
-// Fungsi untuk Cek username pegawai
-const cekUsername = async (username) => {
-  const connection = await pool.connect();
   try {
-    const result = await connection.query('SELECT COUNT(*) FROM pegawai WHERE username = $1', [username]);
-    return result.rows[0].count > 0;
+    let query = 'SELECT COUNT(*) FROM pegawai WHERE username = $1';
+    const params = [username];
+
+    // Jika id_pegawai tidak null (sedang dalam proses update), tambahkan kondisi untuk mengabaikan pegawai dengan id_pegawai tersebut
+    if (id_pegawai !== null) {
+      query += ' AND id_pegawai <> $2';
+      params.push(id_pegawai);
+    }
+
+    const result = await connection.query(query, params);
+    return result.rows[0].count === 0;
   } finally {
     connection.release();
   }
 };
-// Fungsi untuk Cek password pegawai 
-const cekPassword = async (password) => {
+
+// Fungsi untuk cek password unik pada saat tambah dan update data
+const cekPassword = async (password, id_pegawai = null) => {
   const connection = await pool.connect();
   try {
-    const result = await connection.query('SELECT COUNT(*) FROM pegawai WHERE password = $1', [password]);
-    return result.rows[0].count > 0;
-  } finally {
+    let query = 'SELECT COUNT(*) FROM pegawai WHERE password = $1';
+    const params = [password];
+
+    // Jika id_pegawai tidak null (sedang dalam proses update), tambahkan kondisi untuk mengabaikan pegawai dengan id_pegawai tersebut
+    if (id_pegawai !== null) {
+      query += ' AND id_pegawai <> $2';
+      params.push(id_pegawai);
+    }
+    const result = await connection.query(query, params);
+    return result.rows[0].count === 0;
+    } finally {
     connection.release();
   }
 };
+
 
 // Fungsi validasi untuk cekUsername di proses Update
 // Validasi keunikan username (memperhitungkan ID pegawai tertentu)
-const cekUsernameUnique = async (id_pegawai, username) => {
-  const connection = await pool.connect();
-  try {
-    // Validasi username tidak boleh duplikat, kecuali untuk pegawai dengan id_pegawai tertentu
-    const result = await connection.query('SELECT COUNT(*) FROM pegawai WHERE username = $1 AND id_pegawai <> $2', [username, id_pegawai]);
-    return result.rows[0].count === 0;
-  } finally {
-    connection.release();
-  }
-};
+// const cekUsernameUnique = async (id_pegawai, username) => {
+//   const connection = await pool.connect();
+//   try {
+//     // Validasi username tidak boleh duplikat, kecuali untuk pegawai dengan id_pegawai tertentu
+//     const result = await connection.query('SELECT COUNT(*) FROM pegawai WHERE username = $1 AND id_pegawai <> $2', [username, id_pegawai]);
+//     return result.rows[0].count === 0;
+//   } finally {
+//     connection.release();
+//   }
+// };
 
 // Validasi keunikan password (memperhitungkan ID pegawai tertentu)
-const cekPasswordUnique = async (id_pegawai, password) => {
-  const connection = await pool.connect();
-  try {
-    // Validasi password tidak boleh duplikat, kecuali untuk pegawai dengan id_pegawai tertentu
-    const result = await connection.query('SELECT COUNT(*) FROM pegawai WHERE password = $1 AND id_pegawai <> $2', [password, id_pegawai]);
-    return result.rows[0].count === 0;
-  } finally {
-    connection.release();
-  }
-};
+// const cekPasswordUnique = async (id_pegawai, password) => {
+//   const connection = await pool.connect();
+//   try {
+//     // Validasi password tidak boleh duplikat, kecuali untuk pegawai dengan id_pegawai tertentu
+//     const result = await connection.query('SELECT COUNT(*) FROM pegawai WHERE password = $1 AND id_pegawai <> $2', [password, id_pegawai]);
+//     return result.rows[0].count === 0;
+//   } finally {
+//     connection.release();
+//   }
+// };
 
 // Fungsi untuk tambah data pegawai
 const tambahData = async (id_pegawai, username, password, nama, jabatan) => {
@@ -109,23 +128,19 @@ const updateData = async (id_pegawai, username, password, nama, jabatan) => {
   const connection = await pool.connect();
 
   try {
-    // Membuat kueri SQL untuk memperbarui data pegawai
+    // Check if the data exists
+    const existingData = await connection.query('SELECT * FROM pegawai WHERE id_pegawai = $1', [id_pegawai]);
+    
+    if (existingData.rows.length === 0) {
+      throw new Error('Data Pegawai tidak ditemukan');
+    }
+
+    // Update the data
     const query = 'UPDATE pegawai SET username = $2, password = $3, nama = $4, jabatan = $5 WHERE id_pegawai = $1 RETURNING *';
-
-    // Menyusun nilai-nilai parameter untuk diikuti pada placeholder kueri SQL
     const values = [id_pegawai, username, password, nama, jabatan];
-
-    // Menjalankan kueri SQL dengan nilai-nilai yang telah disusun
     const result = await connection.query(query, values);
 
-    // Memeriksa apakah data berhasil diupdate
-    if (result.rows.length > 0) {
-      // Mengembalikan data yang baru diupdate dari hasil kueri
-      return result.rows[0];
-    } else {
-      // Jika tidak ada data yang diupdate, mungkin ID pegawai tidak ditemukan
-      throw new Error('Data Pegawai tidak ditemukan.');
-    }
+    return result.rows[0];
   } finally {
     connection.release();
   }
@@ -147,4 +162,4 @@ const hapusData =  async (id_pegawai) => {
   }
 }
 
-  module.exports = {ambilData, cekID, cekPassword, cekUsername,cekUsernameUnique,cekPasswordUnique, tambahData, updateData, hapusData};
+  module.exports = {ambilData, cekID, cekPassword, cekUsername, tambahData, updateData, hapusData};
