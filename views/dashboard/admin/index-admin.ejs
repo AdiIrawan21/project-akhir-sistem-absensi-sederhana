@@ -15,9 +15,19 @@
             <div class="alert alert-warning" role="alert">Data Pegawai tidak tersedia</div>
         <% } %>
 
-    <div class="class">
-        <a href="/dashboard/admin/tambah" class="btn btn-primary mb-4">+ Tambah Data</a>
-    </div>
+        <div class="d-flex justify-content-evenly">
+            <div class="col">
+                <a href="/dashboard/admin/tambah" class="btn btn-primary mb-4">+ Tambah Data</a>
+            </div>
+            <div class="col">
+                <form class="d-flex " role="search">
+                    <input class="form-control w-50 mx-4 shadow-sm" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-primary" type="submit" >Search</button>
+                  </form>
+            </div>
+        </div>
+
+
 
     <!-- Here is body code -->
     <div class="table-responsive">

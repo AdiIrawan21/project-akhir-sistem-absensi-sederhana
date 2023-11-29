@@ -10,7 +10,7 @@ const cookieParser = require("cookie-parser"); // import module cookie-parser
 const flash = require("connect-flash"); // import module connect-flash
 const session = require("express-session"); // import module express-session
 const {ambilData, cekID,cekUsername, cekPassword, tambahData, updateData, hapusData} = require("./models/pegawaiModels"); // import module models
-const {loadData} = require("./models/kehadiranModels");
+const {loadData, simpanDataKehadiran} = require("./models/kehadiranModels");
 /* ============================================ END =============================================== */
 
 app.set("view engine", "ejs"); //informasi menggunakan ejs
@@ -60,7 +60,7 @@ app.get('/dashboard/admin/tambah', async (req, res) => {
         layout: "dashboard/templates/main-layout"
     })
 })
-
+// Proses add data
 app.post(
     '/dashboard/admin',
     [
@@ -170,24 +170,26 @@ app.get('/dashboard/admin/update/:id_pegawai', async (req,  res)=>{
 
 // Proses Update
 // Route untuk proses update data pegawai
-app.post('/dashboard/admin/update', async (req, res) => {
-  const { id_pegawai, username, password, nama, jabatan } = req.body;
+// app.post('/dashboard/admin/update', async (req, res) => {
+//   const { id_pegawai, username, password, nama, jabatan } = req.body;
+//   const employee = await cekID(req.params.id_pegawai);
+//   console.log(employee);
+//   try {
+//     // console.log('Data dari form:', req.body);
+//     // Update data tanpa validasi username dan password
+//     await updateData(id_pegawai, username, password, nama, jabatan);
 
-  try {
-    console.log('Data dari form:', req.body);
-    // Update data tanpa validasi username dan password
-    await updateData(id_pegawai, username, password, nama, jabatan);
+//     // Handle berhasil update data
+//     req.flash('msg', 'Data Pegawai berhasil diupdate!');
+//     res.redirect('/dashboard/admin');
+//   } catch (error) {
+//     // Handle kesalahan validasi atau update data
+//     console.error(error.message);
+//     req.flash('msg', error.message);
+//     res.redirect('/dashboard/admin');
+//   }
+// });
 
-    // Handle berhasil update data
-    req.flash('msg', 'Data Pegawai berhasil diupdate!');
-    res.redirect('/dashboard/admin');
-  } catch (error) {
-    // Handle kesalahan validasi atau update data
-    console.error(error.message);
-    req.flash('msg', error.message);
-    res.redirect('/dashboard/admin');
-  }
-});
 
 
 
@@ -226,6 +228,15 @@ app.get('/dashboard/admin/delete/:id_pegawai', async (req, res) => {
 
 
 // ================================================= Start Route Folder Kehadiran Dashboard ====================================
+// Route utama halaman absensi
+app.get('/', async(req, res) =>{
+  res.render('dashboard/kehadiran/form-kehadiran', {
+    title: "Page Form Absensi",
+    layout: "layouts/core-layouts",
+  })
+})
+
+// Route ke detail kehadiran
 app.get('/dashboard/kehadiran', async (req,res)=>{
   const kehadiran = await loadData();
     res.render('dashboard/kehadiran/index-kehadiran', {
@@ -234,6 +245,31 @@ app.get('/dashboard/kehadiran', async (req,res)=>{
         kehadiran,
     })
 })
+
+
+// Route untuk menangani pengiriman data formulir absensi
+app.post('/dashboard/kehadiran', async (req, res) => {
+  const { kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar } = req.body;
+
+  try {
+      // Simpan data kehadiran
+      await simpanDataKehadiran(kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar);
+
+      // Set pesan sukses menggunakan req.flash
+      req.flash('msg', 'Terimakasih sudah mengisi absen hari ini!');
+
+      // Redirect ke halaman form absensi
+      res.redirect('/');
+  } catch (err) {
+      console.error(err.message);
+
+      // Set pesan error menggunakan req.flash
+      req.flash('error', 'Terjadi kesalahan saat menyimpan data absensi.');
+
+      // Redirect ke halaman form absensi
+      res.redirect('/');
+  }
+});
 
 // Route ke table rekap absensi
 app.get('/dashboard/rekap', (req,res) => {

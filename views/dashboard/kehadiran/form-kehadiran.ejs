@@ -1,0 +1,46 @@
+<section id="form" class="mt-5 mb-5">
+  <div class="container d-flex justify-content-center">
+
+      <!-- Absensi Form -->
+<form class="card p-4 shadow w-50" method="post" action="/dashboard/kehadiran/" style="line-height: 2px;">
+  <div class="mb-3">
+    <label for="kode" class="form-label">Kode</label>
+    <input type="text" class="form-control h-75" id="kode" name="kode" required />
+  </div>
+  <div class="mb-3">
+    <label for="jabatan" class="form-label">Jabatan</label>
+    <input type="text" class="form-control h-75" id="jabatan" name="jabatan" required />
+  </div>
+  <div class="mb-3">
+    <label for="nama" class="form-label">Nama</label>
+    <input type="text" class="form-control h-75" id="nama" name="nama" required />
+  </div>
+  <div class="mb-3">
+    <label for="tanggal" class="form-label">Tanggal</label>
+    <input type="date" class="form-control h-75" id="tanggal" name="tanggal" required />
+  </div>
+  <div class="">
+      <label for="jabatan" class="form-label" name="keterangan">Keterangan</label>
+  </div>
+  <div class="mb-3">
+      <select class="form-select p-1 rounded rounded-2" name="keterangan" aria-label="Default select example" required>
+        <option value="" disabled selected>Pilih Keterangan...</option>
+        <option name="keterangan" value="pengetesan">Pengetesan</option>
+        <option name="keterangan" value="pelayanan">Pelayanan</option>
+        <option name="keterangan" value="persiapan">Persiapan</option>
+      </select>
+    </div>
+  <div class="mb-3">
+    <label for="jam_masuk" class="form-label">Jam Masuk</label>
+    <input type="time" class="form-control h-75" id="jam_masuk" name="jam_masuk" required />
+  </div>
+  <div class="mb-3">
+    <label for="jam_keluar" class="form-label">Jam Keluar</label>
+    <input type="time" class="form-control h-75" id="jam_keluar" name="jam_keluar" required />
+  </div>
+
+  <button type="submit" class="btn btn-primary" onclick="submitForm()">Absen</button>
+</form>
+  </div>
+
+</section>

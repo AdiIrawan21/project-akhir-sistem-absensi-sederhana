@@ -15,4 +15,22 @@ const loadData = async () => {
     return kehadiran;
   };
 
-  module.exports = {loadData};
+  const simpanDataKehadiran = async (kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar) => {
+    const connection = await pool.connect();
+  
+    try {
+      // Query untuk menyimpan data kehadiran
+      const query = `
+        INSERT INTO kehadiran (kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `;
+  
+      // Eksekusi query dengan parameter yang sesuai
+      await connection.query(query, [kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar]);
+    } finally {
+      connection.release();
+    }
+  };
+  
+
+  module.exports = {loadData, simpanDataKehadiran};

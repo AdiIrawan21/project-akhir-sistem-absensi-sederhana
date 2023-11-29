@@ -16,28 +16,28 @@
         <a href="/dashboard/admin/" class="btn btn-success">Kembali</a>
     </div>
     <!-- Form -->
-    <form method="post" action="/dashboard/admin">
+    <form class="card p-3 shadow-lg" method="post" action="/dashboard/admin">
         <div class="mb-3">
           <label for="id_pegawai" class="form-label">ID</label>
-          <input type="text" class="form-control" id="id_pegawai" name="id_pegawai" required />
+          <input type="text" class="form-control shadow-sm" id="id_pegawai" name="id_pegawai" required />
         </div>
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" name="username" required />
+          <input type="text" class="form-control shadow-sm" id="username" name="username" required />
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="text" class="form-control" id="password" name="password" required />
+            <input type="text" class="form-control shadow-sm" id="password" name="password" required />
         </div>
         <div class="mb-3">
             <label for="nama" class="form-label">Nama</label>
-            <input type="text" class="form-control" id="nama" name="nama" required />
+            <input type="text" class="form-control shadow-sm" id="nama" name="nama" required />
         </div>
         <div class="">
             <label for="jabatan" class="form-label">Jabatan</label>
         </div>
         <div class="mb-3">
-            <select class="form-select" name="jabatan" aria-label="Default select example" required>
+            <select class="form-select p-1 rounded rounded-2" name="jabatan" aria-label="Default select example" required>
               <option value="" disabled selected>Pilih Jabatan...</option>
               <option name="pegawai" value="asisten">Asisten</option>
               <option name="pegawai" value="programmer">Programmer</option>

@@ -124,27 +124,29 @@ const tambahData = async (id_pegawai, username, password, nama, jabatan) => {
 };
 
 // Fungsi untuk update pegawai
-const updateData = async (id_pegawai, username, password, nama, jabatan) => {
-  const connection = await pool.connect();
+// const updateData = async (id_pegawai, username, password, nama, jabatan) => {
+//   const connection = await pool.connect();
 
-  try {
-    // Check if the data exists
-    const existingData = await connection.query('SELECT * FROM pegawai WHERE id_pegawai = $1', [id_pegawai]);
-    
-    if (existingData.rows.length === 0) {
-      throw new Error('Data Pegawai tidak ditemukan');
-    }
+//   try {
+//     // Cek apakah data dengan id_pegawai tersebut ada
+//     const existingData = await connection.query('SELECT * FROM pegawai WHERE id_pegawai = $1', [id_pegawai]);
 
-    // Update the data
-    const query = 'UPDATE pegawai SET username = $2, password = $3, nama = $4, jabatan = $5 WHERE id_pegawai = $1 RETURNING *';
-    const values = [id_pegawai, username, password, nama, jabatan];
-    const result = await connection.query(query, values);
+//     if (existingData.rows.length === 0) {
+//       throw new Error('Data Pegawai tidak ditemukan');
+//     }
 
-    return result.rows[0];
-  } finally {
-    connection.release();
-  }
-};
+//     // Lakukan proses update data
+//     const result = await connection.query(
+//       'UPDATE pegawai SET username = $2, password = $3, nama = $4, jabatan = $5 WHERE id_pegawai = $1 RETURNING *',
+//       [id_pegawai, username, password, nama, jabatan]
+//     );
+
+//     return result.rows[0];
+//   } finally {
+//     connection.release();
+//   }
+// };
+
 
 // Fungsi untuk delete data pegawai
 const hapusData =  async (id_pegawai) => {
@@ -162,4 +164,4 @@ const hapusData =  async (id_pegawai) => {
   }
 }
 
-  module.exports = {ambilData, cekID, cekPassword, cekUsername, tambahData, updateData, hapusData};
+  module.exports = {ambilData, cekID, cekPassword, cekUsername, tambahData, hapusData};
