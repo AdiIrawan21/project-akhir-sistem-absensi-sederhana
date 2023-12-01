@@ -2,27 +2,33 @@
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Data Kehadiran</h1>
+    <div class="d-flex justify-content-evenly mb-4">
+        <div class="col">
+            <h1 class="h3 mb-0 text-gray-800">Data Kehadiran</h1>
+        </div>
+        <div class="col">
+            <form class="d-flex " role="search">
+                <input class="form-control w-50 mx-4 shadow-sm" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-primary" type="submit" >Search</button>
+              </form>
+        </div>
     </div>
     <!-- Here is body code -->
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
-                <th style="min-width: 70px;">ID_Kehadiran</th>
                 <th style="min-width: 70px;">Kode</th>
                 <th style="min-width: 70px;">Jabatan</th>
                 <th style="min-width: 100px;">Nama</th>
                 <th style="min-width: 70px;">Tanggal</th>
                 <th style="min-width: 100px;">Keterangan</th>
                 <th style="min-width: 70px;">Jam Masuk</th>                
-                <th style="min-width: 70px;">Jam Keluar</th>                
+                <th style="min-width: 70px;">Jam Keluar</th>              
+                <th style="min-width: 70px;">Action</th>              
             </thead>
             <tbody>
                 <% kehadiran.forEach((hadir) => {%>
                     <tr class="text-center">
-
-                        <td><%= hadir.id_kehadiran %></td>
                         <td><%= hadir.kode %></td>
                         <td><%= hadir.jabatan %></td>
                         <td><%= hadir.nama %></td>
@@ -30,6 +36,9 @@
                         <td><%= hadir.keterangan %></td>
                         <td><%= hadir.jam_masuk %></td>
                         <td><%= hadir.jam_keluar %></td>
+                        <td>
+                            <a href="/dashboard/kehadiran/delete/<%= hadir.id_kehadiran  %>" button onclick="return confirm('Apakah yakin untuk menghapus kontak?')" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
                         <% }) %>
             </tbody>
         </table>

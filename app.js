@@ -5,12 +5,12 @@ const expressLayouts = require("express-ejs-layouts"); // import module express-
 //const paginate = require("express-paginate");
 const host = "localhost";
 const port = 3000; // konfigurasi port
-const { body, check, validationResult } = require("express-validator"); // import module express validator, untuk melakukan unique pada data nama
+const { body, validationResult } = require("express-validator"); // import module express validator, untuk melakukan unique pada data nama
 const cookieParser = require("cookie-parser"); // import module cookie-parser
 const flash = require("connect-flash"); // import module connect-flash
 const session = require("express-session"); // import module express-session
-const {ambilData, cekID,cekUsername, cekPassword, tambahData, updateData, hapusData} = require("./models/pegawaiModels"); // import module models
-const {loadData, simpanDataKehadiran} = require("./models/kehadiranModels");
+const {ambilData, duplikatPasswordCheck, tambahData, searchPegawai, updateData, hapusData} = require("./models/pegawaiModels");
+const {loadData, simpanDataKehadiran, cek_id, deleteData} = require("./models/kehadiranModels");
 /* ============================================ END =============================================== */
 
 app.set("view engine", "ejs"); //informasi menggunakan ejs
@@ -65,25 +65,26 @@ app.post(
     '/dashboard/admin',
     [
       body('id_pegawai').custom(async (value) => {
-        const cek_id = await cekID(value);
+        const Id_duplicate = await duplikatIDCheck(value);
   
-        if (cek_id) {
+        if (Id_duplicate) {
           throw new Error('ID Pegawai sudah terdaftar');
         } else {
           return true;
         }
       }),
+
       body('username').custom(async (value) => {
-        const cekUser = await cekUsername(value);
+        const cekUsername = await duplikatUsernameCheck(value);
   
-        if (cekUser) {
+        if (cekUsername) {
           throw new Error('Username sudah terdaftar');
         } else {
           return true;
         }
       }),
       body('password').custom(async (value) => {
-        const cekPWD = await cekPassword(value);
+        const cekPWD = await duplikatPasswordCheck(value);
       
         if (cekPWD) {
           throw new Error('Password sudah terdaftar');
@@ -104,13 +105,15 @@ app.post(
         });
       } else {
         try {
-            console.log('Data yang dikirim:', req.body);
-          await tambahData(req.body.id_pegawai, req.body.username, req.body.password, req.body.nama, req.body.jabatan); // menggunakan fungsi tambahData dari function.js
+          console.log('Data yang dikirim:', req.body);
+
+          await tambahData(req.body.id_pegawai, req.body.username, req.body.password, req.body.nama, req.body.jabatan);
           req.flash('msg', 'Data Pegawai Baru Berhasil Ditambahkan!');
           res.redirect('/dashboard/admin/');
         } catch (err) {
-          console.error(err.message);
-          req.flash('msg', err.message);
+          console.error(err.msg);
+          req.flash('msg', "An error occured while adding data");
+          res.status(500);
           res.redirect('/dashboard/admin/');
         }
       }
@@ -120,8 +123,11 @@ app.post(
 // Route untuk detail Pegawai
 app.get('/dashboard/admin/:id_pegawai', async (req, res) =>{
   try {
+    const pegawaiID = req.params.id_pegawai;
+    const employees = await ambilData();
+    const employee = employees.find((pegawai)=> pegawai.id_pegawai === pegawaiID);
     // Menemukan data berdasarkan id_pegawai untuk ditampilkan dalam halaman detail
-    const employee = await cekID(req.params.id_pegawai);
+    //const employee = await cekID(req.params.id_pegawai);
     
     // Menampilkan halaman detail-contact dengan data yang ditemukan
     res.render('dashboard/admin/detail-admin', {
@@ -130,7 +136,7 @@ app.get('/dashboard/admin/:id_pegawai', async (req, res) =>{
       employee,
     });
   } catch (err) {
-    console.error(err.message);
+    console.error(err.msg);
 
     // Menampilkan pesan flash jika terjadi kesalahan
     req.flash('msg', 'Terjadi kesalahan saat mengambil data untuk detail.');
@@ -141,81 +147,91 @@ app.get('/dashboard/admin/:id_pegawai', async (req, res) =>{
 })
 
 // Route untuk update dan proses data Pegawai
-app.get('/dashboard/admin/update/:id_pegawai', async (req,  res)=>{
+app.get('/dashboard/admin/update/:id_pegawai', async (req, res) => {
   try {
     // Menemukan data berdasarkan id_pegawai untuk diupdate
-    const employee = await cekID(req.params.id_pegawai);
-    if (employee) {
-      res.render('dashboard/admin/update-admin', {
-        title: 'Page Update Pegawai',
-        layout: 'dashboard/templates/main-layout',
-        employee,
-        oldID: req.params.id_pegawai,
-      });
-    } else {
-      // Jika data pegawai tidak ditemukan, redirect ke halaman index pegawai
-      req.flash('msg', 'Data kontak tidak ditemukan.');
-      res.redirect('/dashboard/admin');
+    const employees = await searchPegawai(req.params.id_pegawai);
+
+    if (!employees) {
+      // Handle case when employee is not found
+      req.flash('msg', 'Data Pegawai tidak ditemukan.');
+      return res.redirect('dashboard/admin');
     }
+
+    res.render('dashboard/admin/update-admin', {
+      title: 'Page Update Pegawai',
+      layout: 'dashboard/templates/main-layout',
+      employees,
+    });
   } catch (err) {
-    console.error(err.message);
-
-    // Menampilkan pesan flash jika terjadi kesalahan
-    req.flash('msg', 'Terjadi kesalahan saat mengambil data untuk detail.');
-
-    // Redirect ke halaman contact
+    console.error(err.msg);
+    req.flash('msg', 'Terjadi kesalahan saat mengambil data untuk update.');
     res.redirect('/dashboard/admin');
   }
-})
+});
 
 // Proses Update
-// Route untuk proses update data pegawai
-// app.post('/dashboard/admin/update', async (req, res) => {
-//   const { id_pegawai, username, password, nama, jabatan } = req.body;
-//   const employee = await cekID(req.params.id_pegawai);
-//   console.log(employee);
-//   try {
-//     // console.log('Data dari form:', req.body);
-//     // Update data tanpa validasi username dan password
-//     await updateData(id_pegawai, username, password, nama, jabatan);
+app.post('/dashboard/admin/update', [
+  body('password').custom(async (value) => {
+    try {
+      // Check for duplicate password
+      const cekPassword = await duplikatPasswordCheck(value);
+      if (cekPassword) {
+        throw new Error('Password sudah terdaftar.');
+      }
+      return true;
+    } catch (error) {
+      console.error(error); // Tambahkan ini untuk melihat kesalahan
+      throw new Error('Terjadi kesalahan saat memeriksa Password Pegawai.');
+    }
+  }),
+],
+async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render('dashboard/admin/update-admin', {
+        title: 'Page Update Pegawai',
+        layout: 'dashboard/templates/main-layout',
+        errors: errors.array(),
+        employees: req.body,
+      });
+    }
 
-//     // Handle berhasil update data
-//     req.flash('msg', 'Data Pegawai berhasil diupdate!');
-//     res.redirect('/dashboard/admin');
-//   } catch (error) {
-//     // Handle kesalahan validasi atau update data
-//     console.error(error.message);
-//     req.flash('msg', error.message);
-//     res.redirect('/dashboard/admin');
-//   }
-// });
-
-
-
+    await updateData(req.body);
+    req.flash('msg', 'Data Pegawai berhasil di update.');
+    res.redirect('/dashboard/admin');
+  } catch (err) {
+    console.error(err.msg);
+    req.flash('msg', 'Terjadi kesalahan saat mengupdate data Pegawai.');
+    res.redirect('/dashboard/admin');
+  }
+});
 
 // Route untuk delete table pegawai
 app.get('/dashboard/admin/delete/:id_pegawai', async (req, res) => {
   try {
     // Memastikan data ditemukan sebelum dihapus
-    const dataPegawai = await cekID(req.params.id_pegawai);
+    const dataPegawai = await hapusData(req.params.id_pegawai);
 
     if (!dataPegawai) {
       // Jika data tidak ditemukan, tampilkan pesan atau lakukan penanganan khusus
       req.flash('msg', 'Data Pegawai tidak ditemukan.');
-      res.redirect('/dashboard/admin');
-      return;
+    } else {
+      req.flash("msg", "Data Pegawai berhasil dihapus.")
     }
 
     // Menghapus data
-    await hapusData(req.params.id_pegawai);
+    //await hapusData(req.params.id_pegawai);
 
     // Menampilkan pesan flash
-    req.flash('msg', 'Data Pegawai Berhasil Dihapus!');
+    //req.flash('msg', 'Data Pegawai Berhasil Dihapus!');
 
     // Redirect ke halaman dashboard index-admin
     res.redirect('/dashboard/admin');
+
   } catch (err) {
-    console.error(err.message);
+    console.error(err.msg);
 
     // Menampilkan pesan flash jika terjadi kesalahan
     req.flash('msg', 'Terjadi kesalahan saat menghapus data.');
@@ -224,7 +240,6 @@ app.get('/dashboard/admin/delete/:id_pegawai', async (req, res) => {
     res.redirect('/dashboard/admin');
   }
 });
-
 
 
 // ================================================= Start Route Folder Kehadiran Dashboard ====================================
@@ -245,7 +260,6 @@ app.get('/dashboard/kehadiran', async (req,res)=>{
         kehadiran,
     })
 })
-
 
 // Route untuk menangani pengiriman data formulir absensi
 app.post('/dashboard/kehadiran', async (req, res) => {
@@ -271,6 +285,37 @@ app.post('/dashboard/kehadiran', async (req, res) => {
   }
 });
 
+// Route untuk delete data absensi
+app.get('/dashboard/kehadiran/delete/:id_kehadiran', async(req, res)=>{
+  try {
+    // Memastikan data ditemukan sebelum dihapus
+    const dataKehadiran = await cek_id(req.params.id_kehadiran);
+
+    if (!dataKehadiran) {
+      // Jika data tidak ditemukan, tampilkan pesan atau lakukan penanganan khusus
+      req.flash('msg', 'Data Kehadiran tidak ditemukan.');
+      res.redirect('/dashboard/kehadiran');
+      return;
+    }
+
+    // Menghapus data
+    await deleteData(req.params.id_kehadiran);
+
+    // Menampilkan pesan flash
+    req.flash('msg', 'Data kehadiran Berhasil Dihapus!');
+
+    // Redirect ke halaman dashboard index-admin
+    res.redirect('/dashboard/kehadiran');
+  } catch (err) {
+    console.error(err.message);
+
+    // Menampilkan pesan flash jika terjadi kesalahan
+    req.flash('msg', 'Terjadi kesalahan saat menghapus data.');
+
+    // Redirect ke halaman dashboard admin
+    res.redirect('/dashboard/kehadiran');
+  }
+})
 // Route ke table rekap absensi
 app.get('/dashboard/rekap', (req,res) => {
     res.render('dashboard/rekap/index-rekap', {

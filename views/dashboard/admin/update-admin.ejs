@@ -4,44 +4,41 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Update Pegawai</h1>
+        <% if(typeof errors != "undefined") { %>
+            <div class="alert alert-primary" role="alert">
+              <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+              <% }) %>
+            </div>
+            <% } %>
     </div>
-
-    <% if(typeof errors != "undefined") { %>
-        <div class="alert alert-primary" role="alert">
-          <% errors.forEach(error => { %>
-          <li><%= error.msg %></li>
-          <% }) %>
-        </div>
-        <% } %>
-
     <div class="mb-3">
         <a href="/dashboard/admin/" class="btn btn-success">Kembali</a>
     </div>
-
     <!-- Form -->
     <form method="post" action="/dashboard/admin/update">
         <div class="mb-3">
-          <label for="id" class="form-label">ID</label>
-          <input type="text" class="form-control" id="id" name="id" value="<%= employee.id_pegawai %>" readonly />
-        </div>
+            <label for="id_pegawai" class="form-label">ID Pegawai</label>
+            <input type="text" class="form-control" id="id_pegawai" name="id_pegawai" value="<%= employees.id_pegawai ? employees.id_pegawai: '' %>" required />
+          </div>
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" name="username" value="<%= employee.username %>" required />
+          <input type="text" class="form-control" id="username" name="username" value="<%= employees.username ? employees.username: '' %>" required />
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="text" class="form-control" id="password" name="password" value="<%= employee.password %>" required />
+            <input type="text" class="form-control" id="password" name="password" value="<%= employees.password ? employees.password: '' %>" required />
         </div>
         <div class="mb-3">
             <label for="nama" class="form-label">Nama</label>
-            <input type="text" class="form-control" id="nama" name="nama" value="<%= employee.nama %>" required />
+            <input type="text" class="form-control" id="nama" name="nama" value="<%= employees.nama ? employees.nama: '' %>" required />
         </div>
         <div class="">
             <label for="jabatan" class="form-label">Jabatan</label>
         </div>
         <div class="mb-3">
             <select class="form-select" name="jabatan" aria-label="Default select example">
-                <option value="<%= employee.jabatan %>" selected><%= employee.jabatan %></option>
+                <option value="<%= employees.jabatan ? employees.jabatan: '' %>">Pilih Jabatan...</option>
                 <option name="asisten" value="asisten">Asisten</option>
                 <option name="programmer" value="programmer">Programmer</option>
             </select>

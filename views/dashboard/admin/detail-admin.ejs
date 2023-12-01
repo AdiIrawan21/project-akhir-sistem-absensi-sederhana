@@ -5,11 +5,11 @@
 </div>
 <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <h3 class="card-title">ID Pegawai :  <%= employee.id_pegawai %></h3>
-    <p class="card-text">Username :  <%= employee.username %></p>
-    <p class="card-text">Password :  <%= employee.password %></p>
-    <p class="card-text">Nama :  <%= employee.nama %></p>
-    <p class="card-text">Jabatan :  <%= employee.jabatan %></p>
+    <h3 class="card-title">ID Pegawai :  <%= employee.id_pegawai ? employee.id_pegawai: '' %></h3>
+    <p class="card-text">Username :  <%= employee.username ? employee.username: '' %></p>
+    <p class="card-text">Password :  <%= employee.password ? employee.password: '' %></p>
+    <p class="card-text">Nama :  <%= employee.nama ? employee.nama: '' %></p>
+    <p class="card-text">Jabatan :  <%= employee.jabatan ? employee.jabatan: '' %></p>
   </div>
 </div>
 <div class="mt-3">

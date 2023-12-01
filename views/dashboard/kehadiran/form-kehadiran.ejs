@@ -1,5 +1,13 @@
+<div class="container">
 <section id="form" class="mt-5 mb-5">
   <div class="container d-flex justify-content-center">
+    <% if(typeof errors != "undefined") { %>
+      <div class="alert alert-primary" role="alert">
+        <% errors.forEach(error => { %>
+        <li><%= error.msg %></li>
+        <% }) %>
+      </div>
+      <% } %>
 
       <!-- Absensi Form -->
 <form class="card p-4 shadow w-50" method="post" action="/dashboard/kehadiran/" style="line-height: 2px;">
@@ -9,7 +17,13 @@
   </div>
   <div class="mb-3">
     <label for="jabatan" class="form-label">Jabatan</label>
-    <input type="text" class="form-control h-75" id="jabatan" name="jabatan" required />
+  </div>
+  <div class="mb-3">
+    <select class="form-select p-1 rounded rounded-2" name="jabatan" aria-label="Default select example" required>
+      <option value="" disabled selected>Pilih Jabatan...</option>
+      <option name="jabatan" value="pengetesan">Programmer</option>
+      <option name="jabatan" value="pelayanan">Asisten</option>
+    </select>
   </div>
   <div class="mb-3">
     <label for="nama" class="form-label">Nama</label>
@@ -44,3 +58,4 @@
   </div>
 
 </section>
+</div>
