@@ -2,61 +2,55 @@
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">List Pegawai</h1>
+    <div class="d-flex justify-content-evenly">
+        <div class="col">
+            <a href="/dashboard/admin/tambah" class="btn btn-primary mb-4">+ Tambah Data</a>
+        </div>
     </div>
 
-        <!-- menampilkan pesan message dari flash -->
-        <% if (msg.length !== 0) { %>
-            <div class="alert alert-success" role="alert"><%= msg %></div>
-            <% } %>
-        
-        <% if (employees.length === 0) { %>
-            <div class="alert alert-warning" role="alert">Data Pegawai tidak tersedia</div>
-        <% } %>
+    <!-- menampilkan pesan message dari flash -->
+<% if (msg.length !== 0) { %>
+<div class="alert alert-success" role="alert"><%= msg %></div>
+<% } %>
 
-        <div class="d-flex justify-content-evenly">
-            <div class="col">
-                <a href="/dashboard/admin/tambah" class="btn btn-primary mb-4">+ Tambah Data</a>
-            </div>
-            <div class="col">
-                <form class="d-flex " role="search">
-                    <input class="form-control w-50 mx-4 shadow-sm" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-primary" type="submit" >Search</button>
-                  </form>
+<% if (employees.length === 0) { %>
+<div class="alert alert-warning" role="alert">Data Pegawai tidak tersedia</div>
+<% } %>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List Data Pegawai</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID Pegawai</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% employees.forEach((pegawai) => {%>
+                            <tr class="text-center">
+                                <td><%= pegawai.id_pegawai %></td>
+                                <td><%= pegawai.username %></td>
+                                <td><%= pegawai.password %></td>
+                                <td class="text-center">
+                                    <a href="/dashboard/admin/<%= pegawai.id_pegawai %>" class="btn btn-info btn-sm">Detail</a>
+                                    <a href="/dashboard/admin/update/<%= pegawai.id_pegawai %>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="/dashboard/admin/delete/<%= pegawai.id_pegawai  %>" button onclick="return confirm('Apakah yakin untuk menghapus kontak?')" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
             </div>
         </div>
-
-
-
-    <!-- Here is body code -->
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead class="text-center">
-                <th style="min-width: 50px;">ID Pegawai</th>
-                <th style="min-width: 50px;">Username</th>
-                <th style="min-width: 50px;">Password</th>
-                <th style="min-width: 50px;">Action</th>
-            </thead>
-            <tbody>
-                <% employees.forEach((pegawai) => {%>
-                    <tr class="text-center">
-                        <td><%= pegawai.id_pegawai %></td>
-                        <td><%= pegawai.username %></td>
-                        <td><%= pegawai.password %></td>
-                        <td class="text-center">
-                            <a href="/dashboard/admin/<%= pegawai.id_pegawai %>" class="btn btn-info btn-sm">Detail</a>
-                            <a href="/dashboard/admin/update/<%= pegawai.id_pegawai %>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="/dashboard/admin/delete/<%= pegawai.id_pegawai  %>" button onclick="return confirm('Apakah yakin untuk menghapus kontak?')" class="btn btn-danger btn-sm">Delete</a>
-                        </td>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
     </div>
 
 </div>
 <!-- /.container-fluid -->
-
-</div>
-<!-- End of Main Content -->

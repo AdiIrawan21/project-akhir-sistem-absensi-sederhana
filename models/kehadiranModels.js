@@ -1,16 +1,18 @@
 const pool = require("../models/db")
+const { format, parseISO, addMinutes } = require('date-fns');
 
 const loadData = async () => {
     // Membuka koneksi ke database menggunakan pool connection
     const connection = await pool.connect();
     // Membuat kueri SQL untuk mengambil semua data dari tabel pegawai
-    const query = `SELECT * FROM kehadiran`;
+    const query = `SELECT id_kehadiran, kode, jabatan, nama, keterangan, TO_CHAR(tanggal, 'dd/mm/yyyy')AS tanggal_formatted, jam_masuk, jam_keluar, ROUND(EXTRACT(EPOCH FROM (jam_keluar - jam_masuk) / 3600)) AS total_jam FROM kehadiran`;
     // Menjalankan kueri SQL untuk mengambil data
     const results = await connection.query(query);
     // Menutup koneksi ke database
     connection.release();
     // Mengambil hasil kueri (data contact) dari baris hasil
     const kehadiran = results.rows;
+    console.log(kehadiran)
     // Mengembalikan data contact
     return kehadiran;
   };
@@ -72,5 +74,8 @@ const cek_id = async (id_kehadiran) => {
     }
   }
   
+
+  
+
 
   module.exports = {loadData, simpanDataKehadiran, cek_id, deleteData};

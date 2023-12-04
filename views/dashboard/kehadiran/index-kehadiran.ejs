@@ -1,18 +1,28 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
 
-    <!-- Page Heading -->
-    <div class="d-flex justify-content-evenly mb-4">
-        <div class="col">
-            <h1 class="h3 mb-0 text-gray-800">Data Kehadiran</h1>
+    <% if (msg.length !== 0) { %>
+        <div class="alert alert-success" role="alert"><%= msg %></div>
+        <% } %>
+    
+        
+      <% if(typeof errors != "undefined") { %>
+        <div class="alert alert-primary" role="alert">
+          <% errors.forEach(error => { %>
+          <li><%= error.msg %></li>
+          <% }) %>
         </div>
-        <div class="col">
-            <form class="d-flex " role="search">
-                <input class="form-control w-50 mx-4 shadow-sm" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-primary" type="submit" >Search</button>
-              </form>
-        </div>
+        <% } %>
+
+        
+        <% if (kehadiran.length === 0) { %>
+            <div class="alert alert-warning" role="alert">Data Kehadiran Tidak Tersedia</div>
+            <% } %>
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Detail Kehadiran</h1>
     </div>
+    
     <!-- Here is body code -->
     <div class="table-responsive">
         <table class="table table-hover">
@@ -32,7 +42,7 @@
                         <td><%= hadir.kode %></td>
                         <td><%= hadir.jabatan %></td>
                         <td><%= hadir.nama %></td>
-                        <td><%= hadir.tanggal %></td>
+                        <td><%= hadir.tanggal_formatted %></td>
                         <td><%= hadir.keterangan %></td>
                         <td><%= hadir.jam_masuk %></td>
                         <td><%= hadir.jam_keluar %></td>

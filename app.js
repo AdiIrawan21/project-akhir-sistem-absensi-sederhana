@@ -9,7 +9,7 @@ const { body, validationResult } = require("express-validator"); // import modul
 const cookieParser = require("cookie-parser"); // import module cookie-parser
 const flash = require("connect-flash"); // import module connect-flash
 const session = require("express-session"); // import module express-session
-const {ambilData, duplikatPasswordCheck, tambahData, searchPegawai, updateData, hapusData} = require("./models/pegawaiModels");
+const {ambilData, duplikatIDCheck, duplikatUsernameCheck, duplikatPasswordCheck, tambahData, searchPegawai, updateData, hapusData} = require("./models/pegawaiModels");
 const {loadData, simpanDataKehadiran, cek_id, deleteData} = require("./models/kehadiranModels");
 /* ============================================ END =============================================== */
 
@@ -248,6 +248,7 @@ app.get('/', async(req, res) =>{
   res.render('dashboard/kehadiran/form-kehadiran', {
     title: "Page Form Absensi",
     layout: "layouts/core-layouts",
+    msg: req.flash("msg"),
   })
 })
 
@@ -258,6 +259,7 @@ app.get('/dashboard/kehadiran', async (req,res)=>{
         title: "Page Kehadiran",
         layout: "dashboard/templates/main-layout",
         kehadiran,
+        msg: req.flash("msg"),
     })
 })
 
@@ -266,7 +268,7 @@ app.post('/dashboard/kehadiran', async (req, res) => {
   const { kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar } = req.body;
 
   try {
-      // Simpan data kehadiran
+      // Simpan data kehadiran dengan tanggal yang sudah diformat
       await simpanDataKehadiran(kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar);
 
       // Set pesan sukses menggunakan req.flash
@@ -316,13 +318,39 @@ app.get('/dashboard/kehadiran/delete/:id_kehadiran', async(req, res)=>{
     res.redirect('/dashboard/kehadiran');
   }
 })
+
 // Route ke table rekap absensi
-app.get('/dashboard/rekap', (req,res) => {
+app.get('/dashboard/rekap', async (req,res) => {
+  const kehadiran = await loadData();
     res.render('dashboard/rekap/index-rekap', {
         title: "Page Rekap",
-        layout: "dashboard/templates/main-layout"
+        layout: "dashboard/templates/main-layout",
+        kehadiran,
     })
 })
+
+app.post('/dashboard/rekap', async (req, res) => {
+  const { kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar } = req.body;
+
+  try {
+      // Simpan data kehadiran
+      await simpanDataKehadiran(kode, jabatan, nama, tanggal, keterangan, jam_masuk, jam_keluar);
+
+      // Set pesan sukses menggunakan req.flash
+      req.flash('msg', 'Terimakasih sudah mengisi absen hari ini!');
+
+      // Redirect ke halaman form absensi
+      res.redirect('/dashboard/admin/');
+  } catch (err) {
+      console.error(err.message);
+
+      // Set pesan error menggunakan req.flash
+      req.flash('error', 'Terjadi kesalahan saat menyimpan data absensi.');
+
+      // Redirect ke halaman form absensi
+      res.redirect('/dashboard/admin/');
+  }
+});
 
 //===============================================================================================================
 // route error handling jika tidak sesuai, maka akan menampilkan page not found

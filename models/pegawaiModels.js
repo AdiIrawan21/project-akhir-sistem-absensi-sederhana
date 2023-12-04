@@ -55,7 +55,17 @@ const duplikatPasswordCheck = async (password)=>{
   const employees = await ambilData();
   return employees.find((pegawai)=>pegawai.password === password);
 }
+// Fungsi untuk cekId yang duplikat
+const duplikatIDCheck = async (id_pegawai)=>{
+  const employees = await ambilData();
+  return employees.find((pegawai)=>pegawai.id_pegawai === id_pegawai);
+}
 
+// Fungsi untuk cekUsername yang duplikat
+const duplikatUsernameCheck = async (username)=>{
+  const employees = await ambilData();
+  return employees.find((pegawai)=>pegawai.username === username);
+}
 // Fungsi untuk tambah data pegawai
 const tambahData = async (id_pegawai,username, password, nama, jabatan) => {
   // Membuka koneksi ke database menggunakan pool connection
@@ -109,4 +119,4 @@ const hapusData =  async (id_pegawai) => {
   }
 }
 
-module.exports = {ambilData, ambilDataByID, duplikatPasswordCheck, cekID, searchPegawai, updateData, tambahData,hapusData};
+module.exports = {ambilData, ambilDataByID, duplikatIDCheck, duplikatUsernameCheck, duplikatPasswordCheck, cekID, searchPegawai, updateData, tambahData,hapusData};

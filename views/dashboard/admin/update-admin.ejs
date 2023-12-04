@@ -19,7 +19,7 @@
     <form method="post" action="/dashboard/admin/update">
         <div class="mb-3">
             <label for="id_pegawai" class="form-label">ID Pegawai</label>
-            <input type="text" class="form-control" id="id_pegawai" name="id_pegawai" value="<%= employees.id_pegawai ? employees.id_pegawai: '' %>" required />
+            <input type="text" class="form-control" id="id_pegawai" name="id_pegawai" value="<%= employees.id_pegawai ? employees.id_pegawai: '' %>" readonly required />
           </div>
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>

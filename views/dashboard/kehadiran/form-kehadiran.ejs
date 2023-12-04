@@ -1,14 +1,19 @@
 <div class="container">
+  <% if (msg.length !== 0) { %>
+    <div class="alert alert-success" role="alert"><%= msg %></div>
+    <% } %>
+
+    
+  <% if(typeof errors != "undefined") { %>
+    <div class="alert alert-primary" role="alert">
+      <% errors.forEach(error => { %>
+      <li><%= error.msg %></li>
+      <% }) %>
+    </div>
+    <% } %>
+    
 <section id="form" class="mt-5 mb-5">
   <div class="container d-flex justify-content-center">
-    <% if(typeof errors != "undefined") { %>
-      <div class="alert alert-primary" role="alert">
-        <% errors.forEach(error => { %>
-        <li><%= error.msg %></li>
-        <% }) %>
-      </div>
-      <% } %>
-
       <!-- Absensi Form -->
 <form class="card p-4 shadow w-50" method="post" action="/dashboard/kehadiran/" style="line-height: 2px;">
   <div class="mb-3">
