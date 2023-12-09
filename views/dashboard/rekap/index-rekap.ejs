@@ -7,20 +7,19 @@
 
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Rekap Kehadiran</h1>
-        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                class="fas fa-download fa-sm text-white-50"></i> Cetak Kehadiran</a>
+        <!-- <a href="/dashboard/rekap/cetak/" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                class="fas fa-download fa-sm text-white-50"></i> Cetak Kehadiran</a> -->
     </div>
 
     <!-- Here is body code -->
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
-                <th style="min-width: 70px;">Kode</th>
+                <th style="min-width: 70px;">Kode_Pegawai</th>
                 <th style="min-width: 70px;">Jabatan</th>
                 <th style="min-width: 70px;">Nama</th>
                 <th style="min-width: 70px;">Tanggal</th>
-                <th style="min-width: 70px;">Keterangan</th>
-                <th style="min-width: 70px;">Total Jam</th>              
+                <th style="min-width: 70px;">Keterangan</th>             
             </thead>
             <tbody>
                 <% kehadiran.forEach((hadir) => {%>
@@ -30,7 +29,6 @@
                         <td><%= hadir.nama %></td>
                         <td><%= hadir.tanggal_formatted %></td>
                         <td><%= hadir.keterangan %></td>
-                        <td style="color: red"><%= hadir.total_jam %> Jam</td>
                         <% }) %>
             </tbody>
         </table>

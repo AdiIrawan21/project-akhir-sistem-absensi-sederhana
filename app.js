@@ -4,13 +4,16 @@ const app = express(); // membuat aplikasi express
 const expressLayouts = require("express-ejs-layouts"); // import module express-ejs-layouts
 //const paginate = require("express-paginate");
 const host = "localhost";
-const port = 3000; // konfigurasi port
+const port = 3008; // konfigurasi port
 const { body, validationResult } = require("express-validator"); // import module express validator, untuk melakukan unique pada data nama
 const cookieParser = require("cookie-parser"); // import module cookie-parser
 const flash = require("connect-flash"); // import module connect-flash
 const session = require("express-session"); // import module express-session
 const {ambilData, duplikatIDCheck, duplikatUsernameCheck, duplikatPasswordCheck, tambahData, searchPegawai, updateData, hapusData} = require("./models/pegawaiModels");
 const {loadData, simpanDataKehadiran, cek_id, deleteData} = require("./models/kehadiranModels");
+//const auth = require("./middleware/auth");
+//const jwt = require('jsonwebtoken');
+//const {createPDF} = require("./controllers/cetakControllers");
 /* ============================================ END =============================================== */
 
 app.set("view engine", "ejs"); //informasi menggunakan ejs
@@ -352,7 +355,56 @@ app.post('/dashboard/rekap', async (req, res) => {
   }
 });
 
-//===============================================================================================================
+// Route untuk generate pdf
+// app.get('/dashboard/rekap/cetak', async (req, res) => {
+//   try {
+//     const kehadiranData = await loadData();
+
+//     // Cetak ke file PDF
+//     createPDF(kehadiranData, res);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Terjadi kesalahan saat mencetak rekap ke PDF.');
+//   }
+// })
+
+
+// ================================================= Start Route Folder Login ====================================
+
+// app.get('/login', async(req, res)=>{
+//   res.render('auth/login', {
+//     layout:"layouts/login-layouts",
+//     msg:req.flash("msg")
+//   })
+// })
+
+// app.post('/login', async (req, res) => {
+//   const { username, password } = req.body;
+
+//   try {
+//     // Gunakan fungsi autentikasi
+//     const authenticatedUser = await auth.authenticateUser(username, password);
+
+//     if (authenticatedUser) {
+//       // Buat token JWT
+//       const token = jwt.sign({ userId: authenticatedUser.id }, secretKey, { expiresIn: '1h' });
+
+//       // Kirim token sebagai respons atau lakukan sesuatu yang sesuai kebutuhan Anda
+//       res.redirect('/'); // Redirect ke halaman absensi setelah login berhasil
+//     } else {
+//       req.flash('msg', 'Login gagal. Periksa kembali username dan password Anda.');
+//       res.redirect('/login'); // Redirect kembali ke halaman login jika login gagal
+//     }
+//   } catch (error) {
+//     console.error('Error during login:', error);
+//     req.flash('msg', 'Terjadi kesalahan saat login. Silakan coba lagi.');
+//     res.redirect('/login'); // Redirect kembali ke halaman login jika terjadi kesalahan
+//   }
+// });
+
+// =================================================  END Route Folder Login =====================================
+
+// ===============================================================================================================
 // route error handling jika tidak sesuai, maka akan menampilkan page not found
 app.use("/", (req, res) => {
     res.status(404);
